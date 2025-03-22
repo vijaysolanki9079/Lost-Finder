@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost and Found System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            text-align: left;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .modal-body { padding: 15px 0; }
+        .modal-footer { text-align: right; }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .file-input {
+            padding: 10px;
+            border: 2px dashed #4CAF50;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lost and Found System</h1>
+        <p>Click below to report a lost or found item.</p>
+        <button class="btn-primary" id="openModalBtn">Post Item</button>
+    </div>
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Post Item</h3>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="itemForm">
+                    <label>Item Type</label>
+                    <select name="itemType">
+                        <option value="lost">Lost</option>
+                        <option value="found">Found</option>
+                    </select>
+
+                    <label>Category</label>
+                    <select name="category">
+                        <option value="electronics">Electronics</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="documents">Documents</option>
+                        <option value="other">Other</option>
+                    </select>
+
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Provide details about the item..."></textarea>
+
+                    <label>Upload Image</label>
+                    <div class="file-input" onclick="document.getElementById('fileUpload').click();">
+                        Click to upload file
+                    </div>
+                    <input type="file" id="fileUpload" name="image" style="display: none;">
+
+                    <label>Location</label>
+                    <input type="text" name="location" placeholder="Where was the item lost/found?">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="submitBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        
+        openModalBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'flex';
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+        });
+        
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) modalOverlay.style.display = 'none';
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            alert('Item submitted successfully!');
+            modalOverlay.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

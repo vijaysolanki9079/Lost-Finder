@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Item Upload and Compare</title>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #f72585;
+      --light-gray: #f5f5f5;
+      --dark-gray: #333;
+      --white: #fff;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--dark-gray);
+      background-color: var(--light-gray);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .description {
+      max-width: 600px;
+      margin: 0 auto;
+      color: #666;
+    }
+
+    .upload-area {
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .upload-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .upload-box {
+      border: 2px dashed #ccc;
+      border-radius: var(--border-radius);
+      padding: 40px 20px;
+      text-align: center;
+      width: 300px;
+      position: relative;
+      transition: all 0.3s ease;
+      background-color: #fafafa;
+      cursor: pointer;
+    }
+
+    .upload-box:hover {
+      border-color: var(--primary-color);
+      background-color: #f0f7ff;
+    }
+
+    .upload-box.has-file {
+      border-style: solid;
+      border-color: var(--primary-color);
+    }
+
+    .upload-box input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+      color: #999;
+    }
+
+    .upload-box.has-file .upload-icon {
+      color: var(--primary-color);
+    }
+
+    .upload-label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .file-info {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .preview-area {
+      position: relative;
+      width: 100%;
+      height: 150px;
+      margin-top: 15px;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      background-color: #eee;
+    }
+
+    .preview-area img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .preview-area .file-name {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: var(--white);
+      padding: 5px;
+      font-size: 12px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .action-buttons {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background-color: #3050d8;
+    }
+
+    .btn-secondary {
+      background-color: #ccc;
+      color: var(--dark-gray);
+      margin-right: 10px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #bbb;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .comparison-area {
+      display: none;
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-top: 30px;
+    }
+
+    .comparison-title {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .comparison-item {
+      background-color: #f9f9f9;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .comparison-item:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--box-shadow);
+    }
+
+    .comparison-item-image {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      background-color: #eee;
+      border-radius: var(--border-radius);
+    }
+
+    .comparison-item-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .comparison-item-details {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .back-to-upload {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .upload-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .upload-box {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Item Upload and Compare</h1>
+      <p class="description">Upload multiple items and compare them side by side. Supported file types: images (JPEG, PNG, GIF), PDFs, and text files.</p>
+    </header>
+
+    <div class="upload-area">
+      <div class="upload-container">
+        <div class="upload-box" id="upload-box-1">
+          <span class="upload-icon">📁</span>
+          <label class="upload-label">Item 1</label>
+          <p class="file-info">Click or drag file to upload</p>
+          <input type="file" id="file-input-1" accept="image/*,application/pdf,text/plain">
+          <div class="preview-area" id="preview-1">
+            <img src="" alt="">
+            <div class="file-name"></div>
+          </div>
+        </div>
+
+        <div class="upload-box" id="upload-box-2">
+          <span class="upload-icon">📁</span>
+          <label class="upload-label">Item 2</label>
+          <p class="file-info">Click or drag file to upload</p>
+          <input type="file" id="file-input-2" accept="image/*,application/pdf,text/plain">
+          <div class="preview-area" id="preview-2">
+            <img src="" alt="">
+            <div class="file-name"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-secondary" id="add-item-btn">Add Another Item</button>
+        <button class="btn btn-primary" id="compare-btn" disabled>Compare Items</button>
+      </div>
+    </div>
+
+    <div class="comparison-area" id="comparison-area">
+      <h2 class="comparison-title">Item Comparison</h2>
+      <div class="comparison-grid" id="comparison-grid">
+        <!-- Comparison items will be added here dynamically -->
+      </div>
+      <div class="back-to-upload">
+        <button class="btn btn-secondary" id="back-btn">Back to Upload</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const uploadArea = document.querySelector('.upload-area');
+      const comparisonArea = document.getElementById('comparison-area');
+      const comparisonGrid = document.getElementById('comparison-grid');
+      const compareBtn = document.getElementById('compare-btn');
+      const addItemBtn = document.getElementById('add-item-btn');
+      const backBtn = document.getElementById('back-btn');
+      const uploadContainer = document.querySelector('.upload-container');
+      
+      let itemCount = 2;
+      let uploadedFiles = {};
+
+      // Handle file input changes
+      document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', handleFileSelect);
+      });
+
+      // Handle the compare button
+      compareBtn.addEventListener('click', function() {
+        showComparison();
+      });
+
+      // Add another item button
+      addItemBtn.addEventListener('click', function() {
+        itemCount++;
+        
+        const newBox = document.createElement('div');
+        newBox.className = 'upload-box';
+        newBox.id = `upload-box-${itemCount}`;
+        
+        newBox.innerHTML = `
+          <span class="upload-icon">📁</span>
+          <label class="upload-label">Item ${itemCount}</label>
+          <p class="file-info">Click or drag file to upload</p>
+          <input type="file" id="file-input-${itemCount}" accept="image/*,application/pdf,text/plain">
+          <div class="preview-area" id="preview-${itemCount}">
+            <img src="" alt="">
+            <div class="file-name"></div>
+          </div>
+        `;
+        
+        uploadContainer.appendChild(newBox);
+        
+        // Added event listener to the new file input
+        newBox.querySelector('input[type="file"]').addEventListener('change', handleFileSelect);
+      });
+
+      // Back button
+      backBtn.addEventListener('click', function() {
+        comparisonArea.style.display = 'none';
+        uploadArea.style.display = 'block';
+      });
+
+      // Function to handle file selection
+      function handleFileSelect(event) {
+        const input = event.target;
+        const fileId = input.id.split('-')[2];
+        const previewArea = document.getElementById(`preview-${fileId}`);
+        const uploadBox = document.getElementById(`upload-box-${fileId}`);
+        const fileNameDisplay = previewArea.querySelector('.file-name');
+        
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          uploadedFiles[fileId] = file;
+          
+          // Update UI to show file is selected
+          uploadBox.classList.add('has-file');
+          uploadBox.querySelector('.upload-icon').innerHTML = '✅';
+          uploadBox.querySelector('.file-info').textContent = 'File selected';
+          
+          // Display file preview
+          const fileReader = new FileReader();
+          
+          fileReader.onload = function(e) {
+            const previewImg = previewArea.querySelector('img');
+            
+            if (file.type.startsWith('image/')) {
+              previewImg.src = e.target.result;
+              previewArea.style.display = 'flex';
+              fileNameDisplay.textContent = file.name;
+            } else if (file.type === 'application/pdf') {
+              previewImg.src = '/api/placeholder/300/150';
+              previewArea.style.display = 'flex';
+              fileNameDisplay.textContent = `${file.name} (PDF)`;
+            } else {
+              previewImg.src = '/api/placeholder/300/150';
+              previewArea.style.display = 'flex';
+              fileNameDisplay.textContent = `${file.name} (${file.type || 'Unknown'})`;
+            }
+          };
+          
+          fileReader.readAsDataURL(file);
+        }
+        
+        // Enable compare button if at least 2 files are uploaded
+        const uploadedFileCount = Object.keys(uploadedFiles).length;
+        compareBtn.disabled = uploadedFileCount < 2;
+      }
+
+      // Function to show the comparison view
+      function showComparison() {
+        // Clear previous comparison
+        comparisonGrid.innerHTML = '';
+        
+        // Add each uploaded file to the comparison grid
+        for (const [id, file] of Object.entries(uploadedFiles)) {
+          const item = document.createElement('div');
+          item.className = 'comparison-item';
+          
+          let imageUrl = '/api/placeholder/300/200';
+          if (file.type.startsWith('image/')) {
+            imageUrl = URL.createObjectURL(file);
+          }
+          
+          item.innerHTML = `
+            <img src="${imageUrl}" alt="${file.name}" class="comparison-item-image">
+            <div class="comparison-item-title">${file.name}</div>
+            <div class="comparison-item-details">
+              Type: ${file.type || 'Unknown'}<br>
+              Size: ${formatFileSize(file.size)}
+            </div>
+          `;
+          
+          comparisonGrid.appendChild(item);
+        }
+        
+        // Hide upload area and show comparison area
+        uploadArea.style.display = 'none';
+        comparisonArea.style.display = 'block';
+      }
+
+      // Helper function to format file size
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+    });
+  </script>
+</body>
+</html>
