@@ -47,7 +47,7 @@ To get started with Lost Finder, follow these steps:
 
 ## Screenshots
 Include some screenshots of your project to showcase the user interface and features.
-![Screenshot Description](C:\Users\vijay\OneDrive\Pictures\Screenshots\Screenshot 2025-03-22 161307.png)
+![Screenshot Description](screenshotprjoect.png)
 
 ## Contact
 If you have any questions or suggestions, feel free to reach out:
